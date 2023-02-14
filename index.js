@@ -25,7 +25,7 @@ const retry = require('axios-retry-after');
 
 const discord_api = axios.create({
     baseURL: 'https://discord.com/api/',
-    timeout: 3000,
+    timeout: 30000,
     headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
@@ -37,7 +37,7 @@ discord_api.interceptors.response.use(null, retry(discord_api))
 
 const discord_api_bot = axios.create({
     baseURL: 'https://discord.com/api/',
-    timeout: 3000,
+    timeout: 30000,
     headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
