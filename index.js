@@ -8,6 +8,7 @@ const app = express();
 const axios = require('axios');
 //const axios2 = require('axios');
 const retry = require('axios-retry-after');
+const cron = require('node-cron');
 
 // Create a new client instance
 //const client = new Client({
@@ -102,14 +103,7 @@ async function forwardMessage(channel, res, idx) {
 }
 
 
-app.get('/', async (req, res) => {
-    return res.send('Follow documentation ')
-})
-
-app.get('/newMessage', async (req, res) => {
-    
-
-    
+async function runFunction() {
     console.log('ClassWithStaticProperty.beforeValue', ClassWithStaticProperty.beforeValue);
     let url = '';
     let urlTemp = [];
@@ -125,7 +119,7 @@ app.get('/newMessage', async (req, res) => {
         urlTemp.push(discord_api.get(url));
     }
     axios.all(urlTemp).then(axios.spread((obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8,
-        obj9, obj10, obj11, obj12, obj13, obj14, obj15, obj16    ) => {
+        obj9, obj10, obj11, obj12, obj13, obj14, obj15, obj16) => {
         // Both requests are now complete
         forwardMessage(chDest[0], obj1, 0);
         forwardMessage(chDest[1], obj2, 1);
@@ -144,6 +138,17 @@ app.get('/newMessage', async (req, res) => {
         forwardMessage(chDest[14], obj15, 14);
         forwardMessage(chDest[15], obj16, 15);
     }));
+}
+
+app.get('/', async (req, res) => {
+    return res.send('Follow documentation ')
+})
+
+app.get('/newMessage', async (req, res) => {
+    
+    runFunction();
+    
+    
     
     return res.send('Done !')
 })
@@ -151,3 +156,9 @@ app.get('/newMessage', async (req, res) => {
 app.listen(8999, () => {
 
 })
+
+// Schedule tasks to be run on the server.
+cron.schedule('*/1 * * * *', function () {
+    console.log('Running cronjobs');
+    runFunction();
+});
