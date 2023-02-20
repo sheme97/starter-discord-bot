@@ -7,11 +7,11 @@ const express = require('express');
 const app = express();
 const axios = require('axios');
 const retry = require('axios-retry-after');
-const cron = require('node-cron');
+//const cron = require('node-cron');
 
 const discord_api = axios.create({
     baseURL: 'https://discord.com/api/',
-    timeout: 30000,
+    timeout: 60000,
     headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
@@ -23,7 +23,7 @@ discord_api.interceptors.response.use(null, retry(discord_api))
 
 const discord_api_bot = axios.create({
     baseURL: 'https://discord.com/api/',
-    timeout: 30000,
+    timeout: 60000,
     headers: {
         "Access-Control-Allow-Origin": "*",
         "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE",
@@ -88,7 +88,7 @@ async function runFunction() {
             }
             urlTemp.push(discord_api.get(url));
         }
-        axios.all(urlTemp).then(axios.spread((obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8,
+        await axios.all(urlTemp).then(axios.spread((obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8,
             obj9, obj10, obj11, obj12, obj13, obj14, obj15, obj16) => {
             // Both requests are now complete
             forwardMessage(chDest[0], obj1, 0);
@@ -129,7 +129,7 @@ app.listen(8999, () => {
 })
 
 // Schedule tasks to be run on the server.
-cron.schedule('*/1 * * * *', function () {
-    console.log('Running cronjobs');
-    runFunction();
-});
+//cron.schedule('*/1 * * * *', function () {
+//    console.log('Running cronjobs');
+//    runFunction();
+//});
