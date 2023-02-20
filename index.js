@@ -88,6 +88,15 @@ async function runFunction() {
             }
             urlTemp.push(discord_api.get(url));
         }
+        //await forwardMessage(chDest[0], urlTemp[0], 0);
+        //await forwardMessage(chDest[1], urlTemp[1], 1);
+        //await forwardMessage(chDest[2], urlTemp[2], 2);
+        //await forwardMessage(chDest[3], urlTemp[3], 3);
+        //await forwardMessage(chDest[4], urlTemp[4], 4);
+        //await forwardMessage(chDest[5], urlTemp[5], 5);
+        //await forwardMessage(chDest[6], urlTemp[6], 6);
+        //await forwardMessage(chDest[7], urlTemp[7], 7);
+        //await forwardMessage(chDest[8], urlTemp[8], 8);
         await axios.all(urlTemp).then(axios.spread((obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8,
             obj9, obj10, obj11, obj12, obj13, obj14, obj15, obj16) => {
             // Both requests are now complete
@@ -108,6 +117,7 @@ async function runFunction() {
             forwardMessage(chDest[14], obj15, 14);
             forwardMessage(chDest[15], obj16, 15);
         }));
+        await new Promise(resolve => setTimeout(resolve, 25000));
     }
     catch (error) {
         console.log(error)
