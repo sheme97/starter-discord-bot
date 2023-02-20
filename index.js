@@ -2,27 +2,11 @@ require('dotenv').config()
 
 const TOKEN = process.env.TOKEN;
 const token = process.env.NEW_ENV;
-const { Client, Events, GatewayIntentBits, EmbedBuilder } = require('discord.js');
+const { EmbedBuilder } = require('discord.js');
 const express = require('express');
 const app = express();
 const axios = require('axios');
-//const axios2 = require('axios');
 const retry = require('axios-retry-after');
-const cron = require('node-cron');
-
-// Create a new client instance
-//const client = new Client({
-//    intents: [
-//        GatewayIntentBits.Guilds,
-//        GatewayIntentBits.GuildMessages,
-//        GatewayIntentBits.MessageContent
-//    ]
-//});
-//client.once(Events.ClientReady, c => {
-//    console.log(`Ready! Logged in as ${c.user.tag}`);
-//});
-
-//client.login(TOKEN);
 
 const discord_api = axios.create({
     baseURL: 'https://discord.com/api/',
@@ -60,84 +44,80 @@ class ClassWithStaticProperty {
     static beforeValue = [
         0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
     ];
-    //static staticMethod() {
-    //    return 'static method has been called.';
-    //}
-    //static {
-    //    console.log('Class static initialization block called');
-    //}
 }
 
 async function forwardMessage(channel, res, idx) {
-    //let res = await discord_api.get(url);
-    //console.log('url', url);
+    let result = [];
     if (res.data) {
-        const len = res.data.length;
-        
+        const len = res.data.length;        
         if (len > 0) {
             const sortRes = res.data.sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
             for (let resp of sortRes) {
                 let content = resp.content.split('||')[0];
                 console.log('send channel', channel);
                 console.log('content', content);
-                //channel.send(content);
-                let resAxios = await discord_api_bot.post(`/channels/${channel}/messages`, {
+                const resAxios = await discord_api_bot.post(`/channels/${channel}/messages`, {
                     content: content,
                 });
-
-                //console.log('res', res.data);
 
                 const receivedEmbed = resp.embeds[0];
                 if (receivedEmbed) {
                     const exampleEmbed = EmbedBuilder.from(receivedEmbed);
                     console.log('send channel2', channel);
                     //channel.send({ embeds: [exampleEmbed] });
-                    let resAxios2 = await discord_api_bot.post(`/channels/${channel}/messages`, {
+                    const resAxios2 = await discord_api_bot.post(`/channels/${channel}/messages`, {
                         embeds: [exampleEmbed],
                     });
                 }
             }
+            //await Promise.all(requestData);
             ClassWithStaticProperty.beforeValue[idx] = sortRes[len - 1].id ?? 0;
-        }            
+        }    
+        result.push(len);
     }
+    return result;
 }
 
 
 async function runFunction() {
-    console.log('ClassWithStaticProperty.beforeValue', ClassWithStaticProperty.beforeValue);
-    let url = '';
-    let urlTemp = [];
-    for (let x = 0; x < 16; x++) {
-        if (ClassWithStaticProperty.beforeValue[x] === 0) {
-            url = `/channels/${chSource[x]}/messages?limit=100`;
+    try {
+        console.log('ClassWithStaticProperty.beforeValue', ClassWithStaticProperty.beforeValue);
+        let url = '';
+        let urlTemp = [];
+        for (let x = 0; x < 16; x++) {
+            if (ClassWithStaticProperty.beforeValue[x] === 0) {
+                url = `/channels/${chSource[x]}/messages?limit=100`;
+            }
+            else {
+                url = `/channels/${chSource[x]}/messages?limit=100&after=${ClassWithStaticProperty.beforeValue[x]}`;
+            }
+            urlTemp.push(discord_api.get(url));
         }
-        else {
-            url = `/channels/${chSource[x]}/messages?limit=100&after=${ClassWithStaticProperty.beforeValue[x]}`;
-        }
-        //const channel = client.channels.cache.get(chDest[x]);
-        //const forward = await forwardMessage(chDest[x], url, x);
-        urlTemp.push(discord_api.get(url));
+        const data1 = await Promise.all(urlTemp);
+        const data2 = await Promise.all([
+            forwardMessage(chDest[0], data1[0], 0),
+            forwardMessage(chDest[1], data1[1], 1),
+            forwardMessage(chDest[2], data1[2], 2),
+            forwardMessage(chDest[3], data1[3], 3),
+            forwardMessage(chDest[4], data1[4], 4),
+            forwardMessage(chDest[5], data1[5], 5),
+            forwardMessage(chDest[6], data1[6], 6),
+            forwardMessage(chDest[7], data1[7], 7),
+            forwardMessage(chDest[8], data1[8], 8),
+            forwardMessage(chDest[9], data1[9], 9),
+            forwardMessage(chDest[10], data1[10], 10),
+            forwardMessage(chDest[11], data1[11], 11),
+            forwardMessage(chDest[12], data1[12], 12),
+            forwardMessage(chDest[13], data1[13], 13),
+            forwardMessage(chDest[14], data1[14], 14),
+            forwardMessage(chDest[15], data1[15], 15)
+        ]);
+        console.log('runFunction ok');
     }
-    Promise.all(urlTemp).then(axios.spread((obj1, obj2, obj3, obj4, obj5, obj6, obj7, obj8,
-        obj9, obj10, obj11, obj12, obj13, obj14, obj15, obj16) => {
-        // Both requests are now complete
-        forwardMessage(chDest[0], obj1, 0);
-        forwardMessage(chDest[1], obj2, 1);
-        forwardMessage(chDest[2], obj3, 2);
-        forwardMessage(chDest[3], obj4, 3);
-        forwardMessage(chDest[4], obj5, 4);
-        forwardMessage(chDest[5], obj6, 5);
-        forwardMessage(chDest[6], obj7, 6);
-        forwardMessage(chDest[7], obj8, 7);
-        forwardMessage(chDest[8], obj9, 8);
-        forwardMessage(chDest[9], obj10, 9);
-        forwardMessage(chDest[10], obj11, 10);
-        forwardMessage(chDest[11], obj12, 11);
-        forwardMessage(chDest[12], obj13, 12);
-        forwardMessage(chDest[13], obj14, 13);
-        forwardMessage(chDest[14], obj15, 14);
-        forwardMessage(chDest[15], obj16, 15);
-    }));
+    catch (error) {
+        console.log(error);
+    }
+    return 'runFunction ok';
 }
 
 app.get('/', async (req, res) => {
@@ -145,38 +125,151 @@ app.get('/', async (req, res) => {
 })
 
 app.get('/newMessage', async (req, res) => {
+    console.time("response time")
+    await runFunction();
     
-    runFunction();
     
-    
-    
+    console.log('done');
+    console.timeEnd("response time")
     return res.send('Done !')
 })
 
 app.get('/check', async (req, res) => {
+    const x = 0;
+    const result = await check(x);
 
-    console.log('discord_api', discord_api);    
-    console.log('discord_api_bot', discord_api_bot);
-    console.log('discord_api', discord_api.toString());
-    console.log('discord_api_bot', discord_api_bot.toString());
-
-    return res.send('ok');
+    return res.send(`${result.length} data updated`);
 })
 
 app.get('/check1', async (req, res) => {
+    const x = 1;
+    const result = await check(x);
 
-    const result = await discord_api.get(`/channels/${chSource[0]}/messages?limit=100`);
-    console.log('result', result.data);
-
-    return res.send(result.data);
+    return res.send(`${result.length} data updated`);
 })
+
+app.get('/check2', async (req, res) => {
+    const x = 2;
+    const result = await check(x);
+
+    return res.send(`${result.length} data updated`);
+})
+
+app.get('/check3', async (req, res) => {
+    const x = 3;
+    const result = await check(x);
+
+    return res.send(`${result.length} data updated`);
+})
+
+app.get('/check4', async (req, res) => {
+    const x = 4;
+    const result = await check(x);
+
+    return res.send(`${result.length} data updated`);
+})
+
+app.get('/check5', async (req, res) => {
+    const x = 5;
+    const result = await check(x);
+
+    return res.send(`${result.length} data updated`);
+})
+
+app.get('/check6', async (req, res) => {
+    const x = 6;
+    const result = await check(x);
+
+    return res.send(`${result.length} data updated`);
+})
+
+app.get('/check7', async (req, res) => {
+    const x = 7;
+    const result = await check(x);
+
+    return res.send(`${result.length} data updated`);
+})
+
+app.get('/check8', async (req, res) => {
+    const x = 8;
+    const result = await check(x);
+
+    return res.send(`${result.length} data updated`);
+})
+
+app.get('/check9', async (req, res) => {
+    const x = 9;
+    const result = await check(x);
+
+    return res.send(`${result.length} data updated`);
+})
+
+app.get('/check10', async (req, res) => {
+    const x = 10;
+    const result = await check(x);
+    
+    return res.send(`${result.length} data updated`);
+})
+
+app.get('/check11', async (req, res) => {
+    const x = 11;
+    const result = await check(x);
+
+    return res.send(`${result.length} data updated`);
+})
+
+app.get('/check12', async (req, res) => {
+    const x = 12;
+    const result = await check(x);
+
+    return res.send(`${result.length} data updated`);
+})
+
+app.get('/check13', async (req, res) => {
+    const x = 13;
+    const result = await check(x);
+
+    return res.send(`${result.length} data updated`);
+})
+
+app.get('/check14', async (req, res) => {
+    const x = 14;
+    const result = await check(x);
+
+    return res.send(`${result.length} data updated`);
+})
+
+app.get('/check15', async (req, res) => {
+    const x = 15;
+    const result = await check(x);
+
+    return res.send(`${result.length} data updated`);
+})
+
+async function check(x) {
+    let resultCheck = [];
+    try {
+        console.time("response time")
+        console.log('ClassWithStaticProperty.beforeValue', ClassWithStaticProperty.beforeValue);
+        if (ClassWithStaticProperty.beforeValue[x] === 0) {
+            url = `/channels/${chSource[x]}/messages?limit=100`;
+        }
+        else {
+            url = `/channels/${chSource[x]}/messages?limit=100&after=${ClassWithStaticProperty.beforeValue[x]}`;
+        }
+        const result = await discord_api.get(url);
+        const result2 = await forwardMessage(chDest[x], result, x);
+        console.log('ClassWithStaticProperty.beforeValue after', ClassWithStaticProperty.beforeValue);
+        console.timeEnd("response time")
+        resultCheck = result2;
+    }
+    catch (error) {
+        console.log(error)
+    }
+    
+    return resultCheck;
+}
 
 app.listen(8999, () => {
 
 })
-
-// Schedule tasks to be run on the server.
-//cron.schedule('*/1 * * * *', function () {
-//    console.log('Running cronjobs');
-//    runFunction();
-//});
