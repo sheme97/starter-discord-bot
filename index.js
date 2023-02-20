@@ -117,7 +117,7 @@ async function runFunction() {
             forwardMessage(chDest[14], obj15, 14);
             forwardMessage(chDest[15], obj16, 15);
         }));
-        await new Promise(resolve => setTimeout(resolve, 25000));
+        //await new Promise(resolve => setTimeout(resolve, 25000));
     }
     catch (error) {
         console.log(error)
@@ -129,7 +129,7 @@ app.get('/', async (req, res) => {
 })
 
 app.get('/newMessage', async (req, res) => {
-    runFunction();
+    await runFunction();
     
     return res.send('Done !')
 })
