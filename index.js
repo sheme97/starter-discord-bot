@@ -78,6 +78,26 @@ async function forwardMessage(channel, res, idx) {
     return result;
 }
 
+async function preRun() {
+    let ret = [];
+    try {
+        let urlTemp = [];
+        const data1 = discord_api.get(`/channels/${chSource[0]}/messages?limit=100`);
+        const data2 = discord_api.get(`/channels/${chSource[1]}/messages?limit=100`);
+        urlTemp.push(data1);
+        urlTemp.push(data2);
+        const data3 = await Promise.all(urlTemp);
+        var now = new Date();
+        var then = new Date(now.setMinutes(now.getMinutes() - 15));
+        //console.log('data1.data', JSON.stringify(data1.data));
+        const filteredData = data3.map(word => ({ data: word.data.filter(x => new Date(x.timestamp) >= then) }));
+        ret = filteredData;
+    }
+    catch (error) {
+        console.log(error);
+    }
+    return ret;
+}
 
 async function runFunction() {
     try {
@@ -94,23 +114,28 @@ async function runFunction() {
             urlTemp.push(discord_api.get(url));
         }
         const data1 = await Promise.all(urlTemp);
+        const now = new Date();
+        const then = new Date(now.setMinutes(now.getMinutes() - 15)); //filter last 15 minutes
+
+        const filteredData = data1.map(word => ({ data: word.data.filter(x => new Date(x.timestamp) >= then) }));
+
         const data2 = await Promise.all([
-            forwardMessage(chDest[0], data1[0], 0),
-            forwardMessage(chDest[1], data1[1], 1),
-            forwardMessage(chDest[2], data1[2], 2),
-            forwardMessage(chDest[3], data1[3], 3),
-            forwardMessage(chDest[4], data1[4], 4),
-            forwardMessage(chDest[5], data1[5], 5),
-            forwardMessage(chDest[6], data1[6], 6),
-            forwardMessage(chDest[7], data1[7], 7),
-            forwardMessage(chDest[8], data1[8], 8),
-            forwardMessage(chDest[9], data1[9], 9),
-            forwardMessage(chDest[10], data1[10], 10),
-            forwardMessage(chDest[11], data1[11], 11),
-            forwardMessage(chDest[12], data1[12], 12),
-            forwardMessage(chDest[13], data1[13], 13),
-            forwardMessage(chDest[14], data1[14], 14),
-            forwardMessage(chDest[15], data1[15], 15)
+            forwardMessage(chDest[0], filteredData[0], 0),
+            forwardMessage(chDest[1], filteredData[1], 1),
+            forwardMessage(chDest[2], filteredData[2], 2),
+            forwardMessage(chDest[3], filteredData[3], 3),
+            forwardMessage(chDest[4], filteredData[4], 4),
+            forwardMessage(chDest[5], filteredData[5], 5),
+            forwardMessage(chDest[6], filteredData[6], 6),
+            forwardMessage(chDest[7], filteredData[7], 7),
+            forwardMessage(chDest[8], filteredData[8], 8),
+            forwardMessage(chDest[9], filteredData[9], 9),
+            forwardMessage(chDest[10], filteredData[10], 10),
+            forwardMessage(chDest[11], filteredData[11], 11),
+            forwardMessage(chDest[12], filteredData[12], 12),
+            forwardMessage(chDest[13], filteredData[13], 13),
+            forwardMessage(chDest[14], filteredData[14], 14),
+            forwardMessage(chDest[15], filteredData[15], 15)
         ]);
         console.log('runFunction ok');
     }
@@ -123,6 +148,16 @@ async function runFunction() {
 app.get('/', async (req, res) => {
     return res.send('Follow documentation ')
 })
+
+//app.get('/preRun', async (req, res) => {
+//    console.time("response time")
+//    const ret = await preRun();
+
+
+//    console.log('done');
+//    console.timeEnd("response time")
+//    return res.send(ret)
+//})
 
 app.get('/newMessage', async (req, res) => {
     console.time("response time")
